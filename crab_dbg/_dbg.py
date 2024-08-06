@@ -12,12 +12,12 @@ def _is_built_in_types(val: Any) -> bool:
 
 def _is_data_container(val: Any) -> bool:
     """
-    Determine if a value's type if list, tuple, or map.
+    Determine if a value's type if list, tuple, or dict.
     """
     return isinstance(val, list) or isinstance(val, tuple) or isinstance(val, dict)
 
 
-def _get_dbg_arguments(source_code: str, positions: dis.Positions) -> List[str]:
+def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> List[str]:
     """
     Get the arguments to dbg() function as a list of strings. Does not include keyword arguments.
     """
@@ -138,12 +138,12 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     return object_.__class__.__name__ + ' {\n' + '\n'.join(fields_dbg_repr) + '\n' + ' ' * indent + '}'
 
 
-def dbg(*args, sep=' ', end='\n', file=None, flush=False):
+def dbg(*evaluated_args, sep=' ', end='\n', file=None, flush=False):
     """
     Python implementation of rust's dbg!() macro. All behaviour should be the same (or similar at least) as dbg!().
 
     This implementation is meant to be a perfect replacement to python's built-in function print(), so it supports all
-    keyword arguments accepted by print().
+    keyword raw_args accepted by print().
 
     @param sep: Same as print().
     @param end: Same as print().
@@ -152,21 +152,19 @@ def dbg(*args, sep=' ', end='\n', file=None, flush=False):
     """
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
-    arguments = _get_dbg_arguments(inspect.getsource(frame), info.positions)
+    raw_args = _get_dbg_raw_args(inspect.getsource(frame), info.positions)
 
-    assert len(arguments) == len(args), "Number of arguments does not equal to number of received args"
-    for argument, val in zip(arguments, args):
-        if _is_built_in_types(val) and not _is_data_container(val):
-            val_repr = val
-        else:
-            val_repr = _get_human_readable_repr(val)
+    assert len(raw_args) == len(evaluated_args), "Number of raw_args does not equal to number of received args"
+
+    for raw_arg, evaluated_arg in zip(raw_args, evaluated_args):
+        human_readable_repr = _get_human_readable_repr(evaluated_arg)
         print(
-            # [file_abs_path:line_no:col_no] arguments = dbg_repr
+            # [<file_abs_path>:<line_no:col_no>] <raw_args> = <dbg_repr>
             "[%s:%s:%s] %s = %s" % (
                 info.filename,
                 info.lineno,
                 info.positions.col_offset + 1,  # Because this is col idx.
-                argument,
-                val_repr,
+                raw_arg,
+                human_readable_repr,
             ), sep=sep, end=end, file=file, flush=flush
         )
