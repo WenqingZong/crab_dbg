@@ -1,14 +1,19 @@
+from sys import stderr
+
 from crab_dbg import dbg
+
 
 class Node:
     def __init__(self, val=0, next_=None):
-        self._val = 0
-        self._next = next_
+        self.val = val
+        self.next = next_
+
 
 class LinkedList:
     def __init__(self, start=None):
         self.start = start
-    
+
+    @staticmethod
     def create(n: int) -> "LinkedList":
         """
         Create a LinkedList of n elements, value ranges from 0 to n - 1.
@@ -22,10 +27,21 @@ class LinkedList:
         cur = start
         for i in range(1, n):
             new_node = Node(i)
-            cur.next_ = new_node
-            cur = cur.next_
+            cur.next = new_node
+            cur = cur.next
 
         return linked_list
+
+
+class Stack:
+    def __init__(self):
+        self.data = []
+
+    def push(self, item):
+        self.data.append(item)
+
+    def pop(self):
+        return self.data.pop()
 
 
 if __name__ == '__main__':
@@ -35,8 +51,8 @@ if __name__ == '__main__':
     fruits = ['apple', 'peach', 'watermelon']
     country_to_capital_cities = {
         'China': "Beijing",
-        'United Kindom': 'London',
-        'Liyue': 'Liyue Habour',
+        'United Kingdom': 'London',
+        'Liyue': 'Liyue Harbor',
     }
 
     # You can use dbg to inspect a lot of variables.
@@ -47,12 +63,28 @@ if __name__ == '__main__':
         country_to_capital_cities,
     )
 
-    # Or, you can ust dbg to inspect one.
-    dbg(country_to_capital_cities)
+    # Or, you can ust dbg to inspect one. Note that you can pass any keyword arguments originally supported by print()
+    dbg(country_to_capital_cities, file=stderr)
 
     # You can also use dbg to inspect expressions.
     dbg(1 + 1)
 
     # When used with objects, it will show all fields contained by that object.
-    linked_list = LinkedList.create(3)
+    linked_list = LinkedList.create(2)
     dbg(linked_list)
+
+    # dbg() works with lists, tuples, and dictionaries.
+    dbg(
+        [linked_list, linked_list],
+        (linked_list, linked_list),
+        {'a': 1, 'b': linked_list},
+        [1, 2, 3, 4,],
+    )
+
+    # For even more complex structures, it works as well.
+    stack = Stack()
+    stack.push(linked_list)
+    stack.push(linked_list)
+    dbg(stack)
+
+    dbg("What if my input is a string?")

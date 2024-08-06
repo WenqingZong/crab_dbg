@@ -1,51 +1,172 @@
-from dis import Positions
+import dis
 import inspect
-from typing import List
+from typing import Any, List
 
-def _is_built_in_types(val) -> bool:
+
+def _is_built_in_types(val: Any) -> bool:
     """
     Determine if a values is an instance of python built-in types.
     """
-    print(val, type(val), type(val).__module__)
     return type(val).__module__ == 'builtins'
 
-def _get_dbg_arguments(source_code: str, positions: Positions) -> List[str]:
+
+def _is_data_container(val: Any) -> bool:
     """
-    Get the arguments to dbg() function as a list of strings.
+    Determine if a value's type if list, tuple, or map.
     """
+    return isinstance(val, list) or isinstance(val, tuple) or isinstance(val, dict)
+
+
+def _get_dbg_arguments(source_code: str, positions: dis.Positions) -> List[str]:
+    """
+    Get the arguments to dbg() function as a list of strings. Does not include keyword arguments.
+    """
+    def _split_by_out_most_comma(input_: str) -> List[str]:
+        """
+        Split a long string by the out most ','
+
+        E.g. Input is "[linked_list, linked_list], (linked_list, linked_list), {'a': 1, 'b': linked_list}, pai, flag,"
+        Expected outcome is: [
+            "[linked_list, linked_list]",
+            "(linked_list, linked_list)",
+            {'a': 1, 'b': linked_list},
+            "pai",
+            "flag",
+        ]
+        """
+        parts = []
+        current_part = []
+        stack = []
+
+        for char in input_:
+            if char == ',' and not stack:
+                parts.append(''.join(current_part).strip())
+                current_part = []
+            else:
+                current_part.append(char)
+                if char in "([{":
+                    stack.append(char)
+                elif char in ")]}":
+                    if stack and (
+                            (char == ')' and stack[-1] == '(') or
+                            (char == ']' and stack[-1] == '[') or
+                            (char == '}' and stack[-1] == '{')
+                    ):
+                        stack.pop()
+
+        # Append the last part if there's any
+        if current_part:
+            parts.append(''.join(current_part).strip())
+
+        return parts
+
     full_code = source_code.split('\n')
 
     # Get the dbg function call. This might across multiple lines.
     code_lines = list(map(lambda x: x.strip(), full_code[positions.lineno - 1: positions.end_lineno]))
 
     # Concat them into one line.
-    stript_source_code = ''.join(code_lines)
+    striped_source_code = ''.join(code_lines)
 
     # Delete 'dbg(' and the last ')'.
-    arguments_str = stript_source_code[4: -1]
+    arguments_str = striped_source_code[4: -1]
 
-    # Split arguments string by ',', and delete any empty argument (this might happen if the last argument is followed
-    # by a ',')
-    arguments = list(filter(lambda x: len(x) > 0, arguments_str.split(',')))
+    # Split each argument.
+    arguments = list(filter(lambda x: '=' not in x, _split_by_out_most_comma(arguments_str)))
 
     # Clear any remaining whitespaces in argument.
     return list(map(lambda x: x.strip(), arguments))
 
 
-def dbg(*args):
+def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
+    """
+    Get a useful dbg representation of an object.
+
+    By default, python just prints things like '<__main__.LinkedList object at 0x102c47560>', which is useless.
+    This function returns things like:
+    LinkedList {
+        start: Node {
+            val: 0,
+            next: Node {
+                val: 1,
+                next: Node {
+                    val: 2,
+                    next: None,
+                }
+            }
+        }
+    }
+    """
+    INDENT_INCREMENT = 4
+    fields_dbg_repr = []
+
+    # Handle data containers.
+    if isinstance(object_, list) or isinstance(object_, tuple):
+        for item in object_:
+            # <num_of_ident><val>
+            fields_dbg_repr.append('%s%s' % (
+                ' ' * (indent + INDENT_INCREMENT),
+                _get_human_readable_repr(item, indent + INDENT_INCREMENT)
+            ))
+
+        if isinstance(object_, list):
+            return '[\n' + ',\n'.join(fields_dbg_repr) + '\n' + ' ' * indent + ']'
+        else:
+            return '(\n' + ',\n'.join(fields_dbg_repr) + '\n' + ' ' * indent + ')'
+    elif isinstance(object_, dict):
+        for key, value in object_.items():
+            if _is_built_in_types(value):
+                # <num_of_ident><key>: <val>
+                fields_dbg_repr.append('%s%s: %s' % (' ' * (indent + INDENT_INCREMENT), key, value))
+            else:
+                fields_dbg_repr.append('%s%s: %s' % (
+                    ' ' * (indent + INDENT_INCREMENT),
+                    key,
+                    _get_human_readable_repr(value, indent + INDENT_INCREMENT)
+                ))
+        return '{\n' + '\n'.join(fields_dbg_repr) + '\n' + ' ' * indent + '}'
+    elif _is_built_in_types(object_):
+        return str(object_)
+
+    # Just an object
+    for key, value in object_.__dict__.items():
+        fields_dbg_repr.append('%s%s: %s' % (
+            ' ' * (indent + INDENT_INCREMENT),
+            key,
+            _get_human_readable_repr(value, indent + INDENT_INCREMENT)
+        ))
+    return object_.__class__.__name__ + ' {\n' + '\n'.join(fields_dbg_repr) + '\n' + ' ' * indent + '}'
+
+
+def dbg(*args, sep=' ', end='\n', file=None, flush=False):
+    """
+    Python implementation of rust's dbg!() macro. All behaviour should be the same (or similar at least) as dbg!().
+
+    This implementation is meant to be a perfect replacement to python's built-in function print(), so it supports all
+    keyword arguments accepted by print().
+
+    @param sep: Same as print().
+    @param end: Same as print().
+    @param file: Same as print().
+    @param flush: Same as print().
+    """
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
     arguments = _get_dbg_arguments(inspect.getsource(frame), info.positions)
 
     assert len(arguments) == len(args), "Number of arguments does not equal to number of received args"
     for argument, val in zip(arguments, args):
-        val_repr = val if _is_built_in_types(val) else val.__dict__
+        if _is_built_in_types(val) and not _is_data_container(val):
+            val_repr = val
+        else:
+            val_repr = _get_human_readable_repr(val)
         print(
+            # [file_abs_path:line_no:col_no] arguments = dbg_repr
             "[%s:%s:%s] %s = %s" % (
                 info.filename,
                 info.lineno,
                 info.positions.col_offset + 1,  # Because this is col idx.
                 argument,
                 val_repr,
-            )
+            ), sep=sep, end=end, file=file, flush=flush
         )
