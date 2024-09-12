@@ -9,7 +9,7 @@ on:
 jobs:
   ci_check:
     name: CI Check
-    runs-on: python-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
