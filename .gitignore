@@ -2,5 +2,9 @@
 .idea/
 .vscode/
 
+# Virtual Environment
+.venv/
+
 # Generated
 crab_dbg/__pycache__/
+.ruff_cache/

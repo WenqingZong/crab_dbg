@@ -1,3 +1,3 @@
-__all__ = ['dbg']
+__all__ = ["dbg"]
 
 from ._dbg import dbg

@@ -44,20 +44,21 @@ class Stack:
         return self.data.pop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pai = 3.14
     ultimate_answer = 42
     flag = True
-    fruits = ['apple', 'peach', 'watermelon']
+    fruits = ["apple", "peach", "watermelon"]
     country_to_capital_cities = {
-        'China': "Beijing",
-        'United Kingdom': 'London',
-        'Liyue': 'Liyue Harbor',
+        "China": "Beijing",
+        "United Kingdom": "London",
+        "Liyue": "Liyue Harbor",
     }
 
     # You can use dbg to inspect a lot of variables.
     dbg(
-        pai, ultimate_answer,
+        pai,
+        ultimate_answer,
         flag,
         fruits,
         country_to_capital_cities,
@@ -77,8 +78,13 @@ if __name__ == '__main__':
     dbg(
         [linked_list, linked_list],
         (linked_list, linked_list),
-        {'a': 1, 'b': linked_list},
-        [1, 2, 3, 4,],
+        {"a": 1, "b": linked_list},
+        [
+            1,
+            2,
+            3,
+            4,
+        ],
     )
 
     # For even more complex structures, it works as well.

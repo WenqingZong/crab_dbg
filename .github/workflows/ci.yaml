@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  ci_check:
+    name: CI Check
+    runs-on: python-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ruff
+        run: curl -LsSf https://astral.sh/ruff/install.sh | sh
+
+      - name: Code Format Check
+        run: ruff format --check
+
+      - name: Code Lint Check
+        run: ruff check
+
+      - name: Try to run example
+        run: |
+          pip3 install numpy pandas torch
+          python3 examples/example.py
