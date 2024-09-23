@@ -1,5 +1,8 @@
 from sys import stderr
 
+import numpy as np
+import torch
+
 from crab_dbg import dbg
 
 
@@ -31,6 +34,20 @@ class LinkedList:
             cur = cur.next
 
         return linked_list
+
+
+class Phone:
+    def __init__(self, brand, color, price):
+        self.brand = brand
+        self.color = color
+        self.price = price
+
+    def __repr__(self):
+        return "A %s phone made by %s, official price: %s." % (
+            self.color,
+            self.brand,
+            self.price,
+        )
 
 
 class Stack:
@@ -94,3 +111,13 @@ if __name__ == "__main__":
     dbg(stack)
 
     dbg("What if my input is a string?")
+
+    # If your type has its own __repr__ or __str__ implementation, no worries, crab_dbg will jut use it.
+    phone = Phone("Apple", "white", 1099)
+    dbg(phone)
+
+    numpy_array = np.zeros(shape=(2, 3))
+    dbg(numpy_array)
+
+    torch_tensor = torch.from_numpy(numpy_array)
+    dbg(torch_tensor)

@@ -2,6 +2,29 @@ import dis
 import inspect
 from typing import Any, List
 
+import numpy as np
+import pandas
+import torch
+
+
+def _is_numpy_tensor_pandas_data(val: Any):
+    """Check if the value is numpy ndarray, pytorch tensor, pandas data frame"""
+    return (
+        isinstance(val, np.ndarray)
+        or isinstance(val, torch.Tensor)
+        or isinstance(val, pandas.DataFrame)
+    )
+
+
+def _has_custom_repr(val: Any):
+    """Check if the value has a custom __repr__."""
+    return val.__class__.__repr__ is not object.__repr__
+
+
+def _has_custom_str(val: Any):
+    """Check if the value has a custom __str__."""
+    return val.__class__.__str__ is not object.__str__
+
 
 def _is_built_in_types(val: Any) -> bool:
     """
@@ -138,10 +161,14 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
                     )
                 )
         return "{\n" + "\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
-    elif _is_built_in_types(object_):
+    elif _is_numpy_tensor_pandas_data(object_):
+        return "\n" + repr(object_)
+    elif _has_custom_repr(object_):
+        return repr(object_)
+    elif _has_custom_str(object_) or _is_built_in_types(object_):
         return str(object_)
 
-    # Just an object
+    # Just an object without __repr__ or __str__ provided.
     for key, value in object_.__dict__.items():
         fields_dbg_repr.append(
             "%s%s: %s"
@@ -184,7 +211,7 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     for raw_arg, evaluated_arg in zip(raw_args, evaluated_args):
         human_readable_repr = _get_human_readable_repr(evaluated_arg)
         print(
-            # [<file_abs_path>:<line_no:col_no>] <raw_args> = <dbg_repr>
+            # [<file_abs_path>:<line_no>:<col_no>] <raw_args> = <dbg_repr>
             "[%s:%s:%s] %s = %s"
             % (
                 info.filename,

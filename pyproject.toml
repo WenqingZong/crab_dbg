@@ -10,6 +10,9 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "numpy",
+    "pandas",
+    "torch",
 ]
 
 [project.urls]
@@ -20,10 +23,7 @@ packages = ["crab_dbg"]
 
 [tool.uv]
 dev-dependencies = [
-    "numpy>=2.1.1",
-    "pandas>=2.2.3",
     "ruff>=0.6.7",
-    "torch>=2.4.1",
 ]
 
 [build-system]

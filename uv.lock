@@ -5,24 +5,26 @@ requires-python = ">=3.12"
 name = "crab-dbg"
 version = "0.1.0"
 source = { editable = "." }
-
-[package.dev-dependencies]
-dev = [
+dependencies = [
     { name = "numpy" },
     { name = "pandas" },
-    { name = "ruff" },
     { name = "torch" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
 [package.metadata]
+requires-dist = [
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "torch" },
+]
 
 [package.metadata.requires-dev]
-dev = [
-    { name = "numpy", specifier = ">=2.1.1" },
-    { name = "pandas", specifier = ">=2.2.3" },
-    { name = "ruff", specifier = ">=0.6.7" },
-    { name = "torch", specifier = ">=2.4.1" },
-]
+dev = [{ name = "ruff", specifier = ">=0.6.7" }]
 
 [[package]]
 name = "filelock"
