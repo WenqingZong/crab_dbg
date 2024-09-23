@@ -18,10 +18,13 @@ jobs:
         with:
           enable-cache: true
 
-      - name: "Set up Python"
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
+
+      - name: Setup dependencies
+        run: uv sync --dev
 
       - name: Install Ruff
         run: curl -LsSf https://astral.sh/ruff/install.sh | sh
