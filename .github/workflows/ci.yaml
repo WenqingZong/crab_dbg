@@ -35,6 +35,9 @@ jobs:
       - name: Code Lint Check
         run: ruff check
 
+      - name: Run Pytest
+        run: pytest
+
       - name: Try to run example
         run: |
           source .venv/bin/activate

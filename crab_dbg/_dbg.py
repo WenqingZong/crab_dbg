@@ -1,6 +1,6 @@
 import dis
 import inspect
-from typing import Any, List
+from typing import Any
 
 import numpy as np
 import pandas
@@ -40,12 +40,12 @@ def _is_data_container(val: Any) -> bool:
     return isinstance(val, list) or isinstance(val, tuple) or isinstance(val, dict)
 
 
-def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> List[str]:
+def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> list[str]:
     """
     Get the arguments to dbg() function as a list of strings. Does not include keyword arguments.
     """
 
-    def _split_by_out_most_comma(input_: str) -> List[str]:
+    def _split_by_out_most_comma(input_: str) -> list[str]:
         """
         Split a long string by the out most ','
 
@@ -110,9 +110,9 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     """
     Get a useful dbg representation of an object.
 
-    By default, python just prints things like '<__main__.LinkedList object at 0x102c47560>', which is useless.
+    By default, python just prints things like '<__main__.Linkedlist object at 0x102c47560>', which is useless.
     This function returns things like:
-    LinkedList {
+    Linkedlist {
         start: Node {
             val: 0,
             next: Node {
@@ -188,7 +188,7 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     )
 
 
-def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
+def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False) -> list[str]:
     """
     Python implementation of rust's dbg!() macro. All behaviour should be the same (or similar at least) as dbg!().
 
@@ -202,7 +202,13 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     """
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
-    raw_args = _get_dbg_raw_args(inspect.getsource(frame), info.positions)
+
+    # Read the source code file as a single string.
+    source_code = ""
+    with open(info.filename, "r") as f:
+        source_code = f.read()
+
+    raw_args = _get_dbg_raw_args(source_code, info.positions)
 
     assert len(raw_args) == len(
         evaluated_args
