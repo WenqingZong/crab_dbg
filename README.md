@@ -1,2 +1,2 @@
 # crab_dbg
-Python equivalent to Rust's dbg !macro
+Python equivalent to Rust's `dbg!()` macro.
