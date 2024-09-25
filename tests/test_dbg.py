@@ -54,12 +54,13 @@ def test_single_argument():
     # Only one of stdout and stderr will contain the actual output, the other would be empty.
     _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pai"], [pai])
 
+
 def test_single_argument_with_comment():
     stdout, stderr = _redirect_stdout_stderr_to_buffer()
 
     pai = 3.14
     dbg(
-        pai, # This comment should not shown in dbg output
+        pai,  # This comment should not shown in dbg output
     )
     _revert_stdout_stderr_change()
 

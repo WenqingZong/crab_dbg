@@ -102,7 +102,7 @@ def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> list[str]:
             for token_type, token_string, _, _, _ in tokens:
                 if token_type != tokenize.COMMENT:
                     new_line.append(token_string)
-            code_lines[i] = ''.join(new_line)
+            code_lines[i] = "".join(new_line)
 
     # Concat them into one line.
     striped_source_code = "".join(code_lines)
