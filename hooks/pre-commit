@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ruff format
+
+git add --updateq
