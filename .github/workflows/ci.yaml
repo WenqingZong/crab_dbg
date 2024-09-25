@@ -36,7 +36,9 @@ jobs:
         run: ruff check
 
       - name: Run Pytest
-        run: pytest
+        run: |
+          source .venv/bin/activate
+          pytest
 
       - name: Try to run example
         run: |
