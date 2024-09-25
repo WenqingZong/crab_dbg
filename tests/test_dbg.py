@@ -34,7 +34,6 @@ def _assert_correct(
     dbg() output contains line number, and absolute file path, so we cannot exam them.
     """
     dbg_outputs = dbg_outputs.split("\n")
-    print("dbg_outputsssssssss", dbg_outputs)
     assert len(dbg_outputs) - 1 == len(var_names) == len(var_values)
 
     for dbg_output, var_name, var_value in zip(dbg_outputs[:-1], var_names, var_values):
