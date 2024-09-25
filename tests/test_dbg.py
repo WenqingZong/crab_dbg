@@ -34,6 +34,7 @@ def _assert_correct(
     dbg() output contains line number, and absolute file path, so we cannot exam them.
     """
     dbg_outputs = dbg_outputs.split("\n")
+    print("dbg_outputsssssssss", dbg_outputs)
     assert len(dbg_outputs) - 1 == len(var_names) == len(var_values)
 
     for dbg_output, var_name, var_value in zip(dbg_outputs[:-1], var_names, var_values):
@@ -48,6 +49,19 @@ def test_single_argument():
 
     pai = 3.14
     dbg(pai)
+    _revert_stdout_stderr_change()
+
+    # Only one of stdout and stderr will contain the actual output, the other would be empty.
+    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pai"], [pai])
+
+
+def test_single_argument_with_comment():
+    stdout, stderr = _redirect_stdout_stderr_to_buffer()
+
+    pai = 3.14
+    dbg(
+        pai,  # This comment should not shown in dbg output
+    )
     _revert_stdout_stderr_change()
 
     # Only one of stdout and stderr will contain the actual output, the other would be empty.

@@ -1,5 +1,7 @@
 import dis
 import inspect
+from io import StringIO
+import tokenize
 from typing import Any
 
 import numpy as np
@@ -90,6 +92,17 @@ def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> list[str]:
     code_lines = list(
         map(lambda x: x.strip(), full_code[positions.lineno - 1 : positions.end_lineno])
     )
+
+    # Delete inline comments.
+    for i, code_line in enumerate(code_lines):
+        if "#" in code_line:
+            new_line = []
+            # We parse the line into python code so we know if the "#" is comment or a part of a string.
+            tokens = tokenize.generate_tokens(StringIO(code_line).readline)
+            for token_type, token_string, _, _, _ in tokens:
+                if token_type != tokenize.COMMENT:
+                    new_line.append(token_string)
+            code_lines[i] = "".join(new_line)
 
     # Concat them into one line.
     striped_source_code = "".join(code_lines)
@@ -213,6 +226,22 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False) -> list[str]
     assert len(raw_args) == len(
         evaluated_args
     ), "Number of raw_args does not equal to number of received args"
+
+    # If no arguments at all.
+    if len(raw_args) == 0:
+        print(
+            # [<file_abs_path>:<line_no>:<col_no>]
+            "[%s:%s:%s]"
+            % (
+                info.filename,
+                info.lineno,
+                info.positions.col_offset + 1,  # Because this is col idx.
+            ),
+            sep=sep,
+            end=end,
+            file=file,
+            flush=flush,
+        )
 
     for raw_arg, evaluated_arg in zip(raw_args, evaluated_args):
         human_readable_repr = _get_human_readable_repr(evaluated_arg)
