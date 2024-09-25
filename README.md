@@ -1,2 +1,4 @@
-# crab_dbg
+#Crab Debugger (crab_dbg)
+
+
 Python equivalent to Rust's `dbg!()` macro.
