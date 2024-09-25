@@ -4,9 +4,11 @@ This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool
 
 ## Features
 - Easily print values of variables and expressions using `crab_dbg()` function, eliminating the need for multiple `print` statements
-- Supports basic data structures (lists, arrays, etc) including primitive types
-- Able to use custom repr support to show variable's value if a class has a custom repr or str method
+- Supports primitive types (int, char, str, bool, etc.) along with basic and complex data structures (lists, arrays, NumPy arrays, PyTorch tensors, etc.)
+- Able to use custom repr support to show variable's value in a human-redable format if a class has a custom repr or str method
 - Allows you to redirect output to stderr or a custom file for debugging purposes
+- When `dbg()` is called, the output also includes the file name, line number, and other key info for context
+- Able to process multi-line arguments and resursively inspects user-defined classes and nested objects. 
 
 ## Installation
 - Clone Repo
@@ -16,16 +18,32 @@ This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool
 
 ## Example Usge
 
+Case 1:
 ```
 from crab_dbg import dbg
+import numpy as np
+import torch
 
-pai = 3.14
-ultimate_answer = 42
-flag = True
-fruits = ["apple", "peach", "watermelon"]
-
-dbg(pai, ultimate_answer, flag, fruits)
-
+# Basic variables
+x = 42
+y = "hello"
+dbg(x, y)
+```
+Output:
+```
+[<file>:<line>:<col>] x = 42
+[<file>:<line>:<col>] y = hello
+```
+Case 2: 
+```
+arr = np.array([1, 2, 3])
+tensor = torch.tensor([4, 5, 6])
+dbg(arr, tensor)
+```
+Output:
+ ```
+[1 2 3]
+ tensor([4, 5, 6])
 ```
 
 The result of this code will return the variable names and their corresponding values. This repo also contains tests which you can use to vaidate that crab_dbg works correctly. 
