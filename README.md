@@ -13,8 +13,6 @@ This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool
 ## Installation
 - Clone Repo
     - `git clone https://github.com/yourusername/crab_dbg.git`
-- Install requriements.txt
-    - `pip install -r requirements.txt`
 
 ## Example Usage
 
