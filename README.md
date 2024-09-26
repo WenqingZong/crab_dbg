@@ -1,12 +1,9 @@
 # Crab Debugger (crab_dbg)
-
-This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool, which helps developers inspect variables and expressions during development. The `crab_dbg` function allows users to trace the values of variables, objects, lists, dictionaries, and other data structures in real-time without cluttering their codebase with multiple print statements. 
+This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool, which helps developers inspect variables and expressions during development. The `crab_dbg` function allows users to trace the values of variables, objects, lists, dictionaries, and other data structures in real-time without cluttering their codebase with multiple print statements. Essentially, this replaces Python's `print()` function altogether. 
 
 ## Features
 - Easily print values of variables and expressions using `crab_dbg()` function, eliminating the need for multiple `print` statements
 - Supports primitive types (int, char, str, bool, etc.) along with basic and complex data structures (lists, arrays, NumPy arrays, PyTorch tensors, etc.)
-- Able to use custom repr support to show variable's value in a human-readable format if a class has a custom repr or str method
-- Allows you to redirect output to stderr or a custom file for debugging purposes
 - When `dbg()` is called, the output also includes the file name, line number, and other key info for context
 - Able to process multi-line arguments and recursively inspects user-defined classes and nested objects. 
 
@@ -18,33 +15,60 @@ This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool
 
 Case 1:
 ```
-from crab_dbg import dbg
+from sys import stderr
 import numpy as np
 import torch
+from crab_dbg import dbg
 
 # Basic variables
-x = 42
-y = "hello"
-dbg(x, y)
+pai = 3.14
+ultimate_answer = 42
+country_to_capital_cities = {
+    "China": "Beijing",
+    "United Kingdom": "London",
+    "Liyue": "Liyue Harbor",
+}
+
+dbg(
+    pai,
+    ultimate_answer,
+    country_to_capital_cities,
+)
 ```
 Output:
 ```
-[<file>:<line>:<col>] x = 42
-[<file>:<line>:<col>] y = hello
+[file_path:79:1] pai = 3.14
+[file_path:79:1] ultimate_answer = 42
+[file_path:88:1] country_to_capital_cities = {
+    China: Beijing
+    United Kingdom: London
+    Liyue: Liyue Harbor
+}
 ```
 Case 2: 
 ```
-arr = np.array([1, 2, 3])
-tensor = torch.tensor([4, 5, 6])
-dbg(arr, tensor)
+# You can also use dbg to inspect expressions.
+dbg(1 + 1)
+
+# When used with objects, it will show all fields contained by that object.
+linked_list = LinkedList.create(2)
+dbg(linked_list)
 ```
 Output:
  ```
-[1 2 3]
- tensor([4, 5, 6])
+[file_path:91:1] Expression = 2
+[file_path:95:1] Expression = LinkedList {        
+    start: Node {
+        val: 0
+        next: Node {
+            val: 1
+            next: None
+        }
+    }
+}
 ```
 
-The result of this code will return the variable names and their corresponding values. This repo also contains tests which you can use to validate that crab_dbg works correctly. 
+The result of these code snippets will return  variable names and their corresponding values along with their file_path and line number. This repo also contains tests which you can use to validate that the `dbg()` function works correctly. 
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
