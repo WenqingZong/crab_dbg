@@ -1,5 +1,5 @@
 # Crab Debugger (crab_dbg)
-This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool, which helps developers inspect variables and expressions during development. The `crab_dbg` function allows users to trace the values of variables, objects, lists, dictionaries, and other data structures in real-time without cluttering their codebase with multiple print statements. Essentially, this replaces Python's `print()` function altogether. 
+This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool, which helps developers inspect variables and expressions during development. The `crab_dbg` function allows users to trace the values of variables, objects, lists, dictionaries, and other data structures in real-time without cluttering their codebase with multiple print statements. Essentially, this function replaces Python's `print()` function altogether. 
 
 ## Features
 - Easily print values of variables and expressions using the `dbg()` function, eliminating the need for multiple `print()` statements
