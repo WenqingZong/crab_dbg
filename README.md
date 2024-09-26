@@ -10,6 +10,10 @@ This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool
 ## Installation
 - Clone Repo
     - `git clone https://github.com/yourusername/crab_dbg.git`
+- When testing out the code in the example.py file, you may need to add this line in before importing crab_dbg:
+    - `sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))`
+- Ensure that you have the correct dependencies installed using pip
+- Ensure your Python is up to date amd compatible with the fucntions being used in the program. 
 
 ## Example Usage
 
