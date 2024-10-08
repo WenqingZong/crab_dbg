@@ -122,4 +122,5 @@ if __name__ == "__main__":
     torch_tensor = torch.from_numpy(numpy_array)
     dbg(torch_tensor)
 
+    # If invoked without arguments, then it will just print the filename and line number.
     dbg()
