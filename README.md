@@ -1,11 +1,14 @@
 # Crab Debugger
 This repo contains the Python equivalent of Rust's `dbg!()` macro debugging tool, which helps developers inspect variables and expressions during development. The `dbg` method is a perfect replacement for Python built-in function `print` so if that is your way of debugging, then you can switch to `crab_dbg` with just a `Ctrl + R` to replace `print(` with `dbg(`.
 
-## Features
+## Unique Selling Point
 - Easily print values of variables and expressions using the `dbg()` function, eliminating the need for multiple `print()` statements
 - Supports primitive types (int, char, str, bool, etc.) along with basic and complex data structures (lists, arrays, NumPy arrays, PyTorch tensors, etc.)
 - When `dbg()` is called, the output also includes the file name, line number, and other key info for context
-- Able to process multi-line arguments and recursively inspects user-defined classes and nested objects. 
+- Able to process multi-line arguments and recursively inspects user-defined classes and nested objects.
+
+## Optional Features
+Currently (version `0.1.1`), this library have three optional features: `numpy`, `pandas`, and `torch`. You should add the corresponding feature if you want to call `dbg()` on `numpy.ndarray`, `pandas.DataFrame`, or `torch.Tensor`.
 
 ## Example Usage
 ```python
