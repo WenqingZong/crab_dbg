@@ -1,6 +1,6 @@
 [project]
 name = "crab_dbg"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python equivalent to Rust's `dbg!()` macro"
 keywords = ["dbg", "debug", "rust"]
 license = { text = "GNU General Public License v3 (GPLv3)" }
@@ -8,12 +8,13 @@ readme = "README.md"
 authors = [
     { name = "Wenqing Zong", email = "wenqing.zong98@gmail.com" }
 ]
-requires-python = ">=3.12"
-dependencies = [
-    "numpy",
-    "pandas",
-    "torch",
-]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+numpy = ["numpy>=2.0"]
+pandas = ["pandas>=2.0"]
+torch = ["torch>=2.0"]
 
 [project.urls]
 repository = "https://github.com/WenqingZong/crab_dbg"
@@ -23,9 +24,8 @@ packages = ["crab_dbg"]
 
 [tool.uv]
 dev-dependencies = [
-    "ipython>=8.27.0",
-    "pytest>=8.3.3",
-    "ruff>=0.6.7",
+    "pytest",
+    "ruff",
 ]
 
 [build-system]

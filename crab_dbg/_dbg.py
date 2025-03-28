@@ -4,26 +4,46 @@ from io import StringIO
 import tokenize
 from typing import Any
 
-import numpy as np
-import pandas
-import torch
+NUMPY_ENABLED = True
+try:
+    import numpy as np
+except ImportError(np):
+    # Get rid of a PyCharm warning: https://stackoverflow.com/questions/42453848/warning-x-in-try-block-with-except-importerror-should-also-be-defined-in-ex
+    NUMPY_ENABLED = False
+
+PANDAS_ENABLED = True
+try:
+    import pandas
+except ImportError(pandas):
+    PANDAS_ENABLED = False
+
+TORCH_ENABLED = True
+try:
+    import torch
+except ImportError(torch):
+    TORCH_ENABLED = False
 
 
-def _is_numpy_tensor_pandas_data(val: Any):
-    """Check if the value is numpy ndarray, pytorch tensor, pandas data frame"""
-    return (
-        isinstance(val, np.ndarray)
-        or isinstance(val, torch.Tensor)
-        or isinstance(val, pandas.DataFrame)
-    )
+def _is_numpy_tensor_pandas_data(val: Any) -> bool:
+    """Check if the value is numpy ndarray, pytorch tensor, or pandas data frame"""
+    if NUMPY_ENABLED and isinstance(val, np.ndarray):
+        return True
+
+    if PANDAS_ENABLED and isinstance(val, pandas.DataFrame):
+        return True
+
+    if TORCH_ENABLED and isinstance(val, torch.Tensor):
+        return True
+
+    return False
 
 
-def _has_custom_repr(val: Any):
+def _has_custom_repr(val: Any) -> bool:
     """Check if the value has a custom __repr__."""
     return val.__class__.__repr__ is not object.__repr__
 
 
-def _has_custom_str(val: Any):
+def _has_custom_str(val: Any) -> bool:
     """Check if the value has a custom __str__."""
     return val.__class__.__str__ is not object.__str__
 
@@ -201,7 +221,7 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     )
 
 
-def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False) -> list[str]:
+def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     """
     Python implementation of rust's dbg!() macro. All behaviour should be the same (or similar at least) as dbg!().
 
@@ -223,9 +243,9 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False) -> list[str]
 
     raw_args = _get_dbg_raw_args(source_code, info.positions)
 
-    assert len(raw_args) == len(
-        evaluated_args
-    ), "Number of raw_args does not equal to number of received args"
+    assert len(raw_args) == len(evaluated_args), (
+        "Number of raw_args does not equal to number of received args"
+    )
 
     # If no arguments at all.
     if len(raw_args) == 0:

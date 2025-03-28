@@ -24,7 +24,7 @@ jobs:
           python-version-file: "pyproject.toml"
 
       - name: Setup dependencies
-        run: uv sync --dev
+        run: uv sync --dev --all-extras
 
       - name: Install Ruff
         run: curl -LsSf https://astral.sh/ruff/install.sh | sh

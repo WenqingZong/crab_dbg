@@ -2,4 +2,4 @@
 
 ruff format
 
-git add --updateq
+git add --update

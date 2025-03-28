@@ -31,7 +31,7 @@ dbg(
     country_to_capital_cities,
 )
 
-# Or, you can ust dbg to inspect one. Note that you can pass any keyword arguments originally supported by print()
+# Or, you can use dbg to inspect one. Note that you can pass any keyword arguments originally supported by print()
 dbg(country_to_capital_cities, file=stderr)
 
 # You can also use dbg to inspect expressions.
@@ -66,7 +66,7 @@ dbg("What if my input is a string?")
 phone = Phone("Apple", "white", 1099)
 dbg(phone)
 
-# It works with your favorite machine learning data structures as well.
+# It works with your favorite machine learning data structures as well, if you enabled corresponding features.
 import numpy as np
 import torch
 numpy_array = np.zeros(shape=(2, 3))

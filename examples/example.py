@@ -81,7 +81,7 @@ if __name__ == "__main__":
         country_to_capital_cities,
     )
 
-    # Or, you can ust dbg to inspect one. Note that you can pass any keyword arguments originally supported by print()
+    # Or, you can use dbg to inspect one. Note that you can pass any keyword arguments originally supported by print()
     dbg(country_to_capital_cities, file=stderr)
 
     # You can also use dbg to inspect expressions.
@@ -116,6 +116,7 @@ if __name__ == "__main__":
     phone = Phone("Apple", "white", 1099)
     dbg(phone)
 
+    # This library can also be used with your favorite data science libraries if you enabled our optional features.
     numpy_array = np.zeros(shape=(2, 3))
     dbg(numpy_array)
 
