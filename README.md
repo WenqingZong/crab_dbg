@@ -66,7 +66,7 @@ dbg("What if my input is a string?")
 phone = Phone("Apple", "white", 1099)
 dbg(phone)
 
-# It works with your favorite machine learning data structures as well.
+# It works with your favorite machine learning data structures as well, if you enabled corresponding features.
 import numpy as np
 import torch
 numpy_array = np.zeros(shape=(2, 3))
