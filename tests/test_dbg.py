@@ -59,7 +59,7 @@ def test_single_argument_with_comment():
 
     pai = 3.14
     dbg(
-        pai,  # This comment should not shown in dbg output
+        pai,  # This comment should not show in dbg output
     )
     _revert_stdout_stderr_change()
 

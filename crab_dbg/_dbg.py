@@ -201,7 +201,7 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     )
 
 
-def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False) -> list[str]:
+def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     """
     Python implementation of rust's dbg!() macro. All behaviour should be the same (or similar at least) as dbg!().
 

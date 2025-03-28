@@ -8,11 +8,11 @@ readme = "README.md"
 authors = [
     { name = "Wenqing Zong", email = "wenqing.zong98@gmail.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
-    "numpy",
-    "pandas",
-    "torch",
+    "numpy>=2.0",
+    "pandas>=2.0",
+    "torch>=2.0",
 ]
 
 [project.urls]
@@ -23,9 +23,8 @@ packages = ["crab_dbg"]
 
 [tool.uv]
 dev-dependencies = [
-    "ipython>=8.27.0",
-    "pytest>=8.3.3",
-    "ruff>=0.6.7",
+    "pytest",
+    "ruff",
 ]
 
 [build-system]
