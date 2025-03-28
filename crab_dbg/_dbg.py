@@ -7,20 +7,19 @@ from typing import Any
 NUMPY_ENABLED = True
 try:
     import numpy as np
-except ImportError(np):
-    # Get rid of a PyCharm warning: https://stackoverflow.com/questions/42453848/warning-x-in-try-block-with-except-importerror-should-also-be-defined-in-ex
+except (ModuleNotFoundError, ImportError):
     NUMPY_ENABLED = False
 
 PANDAS_ENABLED = True
 try:
     import pandas
-except ImportError(pandas):
+except (ModuleNotFoundError, ImportError):
     PANDAS_ENABLED = False
 
 TORCH_ENABLED = True
 try:
     import torch
-except ImportError(torch):
+except (ModuleNotFoundError, ImportError):
     TORCH_ENABLED = False
 
 
