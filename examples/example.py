@@ -42,7 +42,7 @@ class Phone:
         self.price = price
 
     def __repr__(self):
-        return "A %s phone made by %s, official price: %s." % (
+        return "Phone:\n    Color: %s\n    Brand: %s\n    Price: %s\n" % (
             self.color,
             self.brand,
             self.price,
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     dbg(
         [double_linked_list, double_linked_list],
         (double_linked_list, double_linked_list),
-        {"a": 1, "b": double_linked_list},
+        {"a": 1, "b": [double_linked_list]},
         [
             1,
             2,
@@ -119,6 +119,7 @@ if __name__ == "__main__":
     # If your type has its own __repr__ or __str__ implementation, no worries, crab_dbg will jut use it.
     phone = Phone("Apple", "white", 1099)
     dbg(phone)
+    dbg({"my_phones": [phone]})
 
     # If you are extremely bored.
     infinite_list = []
