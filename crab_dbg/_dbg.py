@@ -1,7 +1,8 @@
 import dis
 import inspect
 from io import StringIO
-from sys import modules, stderr
+from os import path
+from sys import stderr
 import tokenize
 from typing import Any
 
@@ -265,10 +266,10 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     # If no arguments at all.
     if len(raw_args) == 0:
         print(
-            # [<file_abs_path>:<line_no>:<col_no>]
+            # [<file_rel_path>:<line_no>:<col_no>]
             "[%s:%s:%s]"
             % (
-                info.filename,
+                path.relpath(info.filename),
                 info.lineno,
                 info.positions.col_offset + 1,  # Because this is col idx.
             ),
@@ -281,10 +282,10 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     for raw_arg, evaluated_arg in zip(raw_args, evaluated_args):
         human_readable_repr = _get_human_readable_repr(evaluated_arg)
         print(
-            # [<file_abs_path>:<line_no>:<col_no>] <raw_args> = <dbg_repr>
+            # [<file_rel_path>:<line_no>:<col_no>] <raw_args> = <dbg_repr>
             "[%s:%s:%s] %s = %s"
             % (
-                info.filename,
+                path.relpath(info.filename),
                 info.lineno,
                 info.positions.col_offset + 1,  # Because this is col idx.
                 raw_arg,
