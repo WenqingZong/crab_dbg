@@ -1,14 +1,15 @@
+from ast import parse, unparse
 import dis
 import inspect
-from io import StringIO
 from os import path
 from sys import stderr
-import tokenize
 from typing import Any
 
 
 def _is_numpy_tensor_pandas_data(val: Any) -> bool:
     """Check if the value is numpy ndarray, pytorch tensor, or pandas data frame"""
+
+    # Cannot use isinstance() here as import those large library is too time-consuming.
     cls = val.__class__
     module = cls.__module__
     name = cls.__name__
@@ -45,93 +46,23 @@ def _is_built_in_types(val: Any) -> bool:
     return type(val).__module__ == "builtins"
 
 
-def _is_data_container(val: Any) -> bool:
-    """
-    Determine if a value's type if list, tuple, or dict.
-    """
-    return (
-        isinstance(val, list)
-        or isinstance(val, tuple)
-        or isinstance(val, dict)
-        or isinstance(val, set)
-    )
-
-
 def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> list[str]:
     """
     Get the arguments to dbg() function as a list of strings. Does not include keyword arguments.
     """
-
-    def _split_by_out_most_comma(input_: str) -> list[str]:
-        """
-        Split a long string by the out most ','
-
-        E.g. Input is "[linked_list, linked_list], (linked_list, linked_list), {'a': 1, 'b': linked_list}, pai, flag,"
-        Expected outcome is: [
-            "[linked_list, linked_list]",
-            "(linked_list, linked_list)",
-            {'a': 1, 'b': linked_list},
-            "pai",
-            "flag",
-        ]
-        """
-        parts = []
-        current_part = []
-        stack = []
-
-        for char in input_:
-            if char == "," and not stack:
-                parts.append("".join(current_part).strip())
-                current_part = []
-            else:
-                current_part.append(char)
-                if char in "([{":
-                    stack.append(char)
-                elif char in ")]}":
-                    if stack and (
-                        (char == ")" and stack[-1] == "(")
-                        or (char == "]" and stack[-1] == "[")
-                        or (char == "}" and stack[-1] == "{")
-                    ):
-                        stack.pop()
-
-        # Append the last part if there's any
-        if current_part:
-            parts.append("".join(current_part).strip())
-
-        return parts
-
-    full_code = source_code.split("\n")
+    source_code_lines: list[str] = source_code.split("\n")
 
     # Get the dbg function call. This might across multiple lines.
-    code_lines = list(
-        map(lambda x: x.strip(), full_code[positions.lineno - 1 : positions.end_lineno])
+    dbg_call_lines: list[str] = list(
+        map(
+            lambda x: x.strip(),
+            source_code_lines[positions.lineno - 1 : positions.end_lineno],
+        )
     )
 
-    # Delete inline comments.
-    for i, code_line in enumerate(code_lines):
-        if "#" in code_line:
-            new_line = []
-            # We parse the line into python code so we know if the "#" is comment or a part of a string.
-            tokens = tokenize.generate_tokens(StringIO(code_line).readline)
-            for token_type, token_string, _, _, _ in tokens:
-                if token_type != tokenize.COMMENT:
-                    new_line.append(token_string)
-            code_lines[i] = "".join(new_line)
-
-    # Concat them into one line.
-    striped_source_code = "".join(code_lines)
-
-    # Delete 'dbg(' and the last ')'.
-    arguments_str = striped_source_code[4:-1]
-
-    # Split each argument.
-    arguments = list(
-        filter(lambda x: "=" not in x, _split_by_out_most_comma(arguments_str))
-    )
-
-    # Clear any remaining whitespaces in argument.
-    return list(map(lambda x: x.strip(), arguments))
+    dbg_call: str = "\n".join(dbg_call_lines)
+    dbg_call_args = parse(dbg_call).body[0].value.args
+    return [unparse(arg) for arg in dbg_call_args]
 
 
 def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
@@ -218,10 +149,11 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     )
 
 
-def _get_source_code(frame: "inspect.FrameType", filename: str) -> str | None:
+# TODO: How to add typehint for frame argument?
+def _get_source_code(frame, filename: str) -> str | None:
     """
     Get the source code of this frame as a single string.
-    We try to read the named file first, if failed, then try inspect.getsource to handle the cases where source code
+    We try to read the named file first, if failed, then try inspect.getsource() to handle the cases where source code
     file is not available.
     """
     try:
@@ -231,7 +163,7 @@ def _get_source_code(frame: "inspect.FrameType", filename: str) -> str | None:
         pass
 
     try:
-        return inspect.getsource()
+        return inspect.getsource(frame)
     except OSError:
         return None
 
