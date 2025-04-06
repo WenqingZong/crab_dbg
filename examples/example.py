@@ -1,8 +1,5 @@
 from sys import stderr
 
-import numpy as np
-import torch
-
 from crab_dbg import dbg
 
 
@@ -76,6 +73,9 @@ if __name__ == "__main__":
     # You can use dbg to inspect a lot of variables.
     dbg(
         pi,
+        1 + 1,
+        sorted(stock_price),
+        "This string contains (, ' and ,",
         ultimate_answer,
         flag,  # You can leave a comment here as well, dbg() won't show this comment.
         stock_price,
@@ -118,12 +118,14 @@ if __name__ == "__main__":
     phone = Phone("Apple", "white", 1099)
     dbg(phone)
 
-    # This library can also be used with your favorite data science libraries if you enabled our optional features.
-    numpy_array = np.zeros(shape=(2, 3))
-    dbg(numpy_array)
-
-    torch_tensor = torch.from_numpy(numpy_array)
-    dbg(torch_tensor)
-
     # If invoked without arguments, then it will just print the filename and line number.
     dbg()
+
+    # import numpy as np
+    # import torch
+    # # This library can also be used with your favorite data science libraries if you enabled our optional features.
+    # numpy_array = np.zeros(shape=(2, 3))
+    # dbg(numpy_array)
+    #
+    # torch_tensor = torch.from_numpy(numpy_array)
+    # dbg(torch_tensor)
