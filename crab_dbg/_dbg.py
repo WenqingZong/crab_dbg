@@ -85,6 +85,28 @@ def _get_human_readable_repr(obj: Any) -> str:
     }
     """
 
+    def _indent_multiline_str(string: str, indent: int) -> str:
+        """
+        Apply additional indent to a possibly already formated, multiline representation.
+        """
+        lines = string.splitlines(keepends=True)
+        if not lines:
+            return ""
+
+        # No need to indent the first line.
+        first_line = lines[0].rstrip("\n\r")
+        if len(lines) == 1:
+            return first_line
+
+        # Add indent.
+        indented_lines = [first_line]
+        for line in lines[1:]:
+            stripped_line = line.rstrip("\n\r")
+            indented_line = " " * indent + stripped_line
+            indented_lines.append(indented_line)
+
+        return "\n".join(indented_lines)
+
     INDENT_INCREMENT = 4
 
     def _get_human_readable_repr_recursion(
@@ -130,29 +152,24 @@ def _get_human_readable_repr(obj: Any) -> str:
                     )
             elif isinstance(obj, dict):
                 for key, value in obj.items():
-                    if _is_built_in_types(value):
+                    fields_dbg_repr.append(
                         # <num_of_ident><key>: <val>
-                        fields_dbg_repr.append(
-                            "%s%s: %s" % (" " * (indent + INDENT_INCREMENT), key, value)
+                        "%s%s: %s"
+                        % (
+                            " " * (indent + INDENT_INCREMENT),
+                            key,
+                            _get_human_readable_repr_recursion(
+                                value, indent + INDENT_INCREMENT, recursion_path
+                            ),
                         )
-                    else:
-                        fields_dbg_repr.append(
-                            "%s%s: %s"
-                            % (
-                                " " * (indent + INDENT_INCREMENT),
-                                key,
-                                _get_human_readable_repr_recursion(
-                                    value, indent + INDENT_INCREMENT, recursion_path
-                                ),
-                            )
-                        )
+                    )
                 return "{\n" + "\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
             elif _is_numpy_tensor_pandas_data(obj):
                 return "\n" + repr(obj)
             elif _has_custom_repr(obj):
-                return repr(obj)
+                return _indent_multiline_str(repr(obj), indent)
             elif _has_custom_str(obj) or _is_built_in_types(obj):
-                return str(obj)
+                return _indent_multiline_str(str(obj), indent)
             else:
                 # Just an object without __repr__ or __str__ provided.
                 for key, value in obj.__dict__.items():
