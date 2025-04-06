@@ -46,22 +46,22 @@ def _assert_correct(
 def test_single_argument():
     stdout, stderr = _redirect_stdout_stderr_to_buffer()
 
-    pai = 3.14
-    dbg(pai)
+    pi = 3.14
+    dbg(pi)
     _revert_stdout_stderr_change()
 
     # Only one of stdout and stderr will contain the actual output, the other would be empty.
-    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pai"], [pai])
+    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pi"], [pi])
 
 
 def test_single_argument_with_comment():
     stdout, stderr = _redirect_stdout_stderr_to_buffer()
 
-    pai = 3.14
+    pi = 3.14
     dbg(
-        pai,  # This comment should not show in dbg output
+        pi,  # This comment should not show in dbg output
     )
     _revert_stdout_stderr_change()
 
     # Only one of stdout and stderr will contain the actual output, the other would be empty.
-    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pai"], [pai])
+    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pi"], [pi])
