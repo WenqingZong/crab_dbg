@@ -62,7 +62,7 @@ class Stack:
 
 
 if __name__ == "__main__":
-    pai = 3.14
+    pi = 3.14
     ultimate_answer = 42
     flag = True
     fruits = ["apple", "peach", "watermelon"]
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     # You can use dbg to inspect a lot of variables.
     dbg(
-        pai,
+        pi,
         ultimate_answer,
         flag,  # You can leave a comment here as well, dbg() won't show this comment.
         fruits,

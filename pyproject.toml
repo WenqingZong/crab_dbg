@@ -11,11 +11,6 @@ authors = [
 requires-python = ">=3.10"
 dependencies = []
 
-[project.optional-dependencies]
-numpy = ["numpy>=2.0"]
-pandas = ["pandas>=2.0"]
-torch = ["torch>=2.0"]
-
 [project.urls]
 repository = "https://github.com/WenqingZong/crab_dbg"
 
