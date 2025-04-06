@@ -65,7 +65,7 @@ def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> list[str]:
     return [unparse(arg) for arg in dbg_call_args]
 
 
-def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
+def _get_human_readable_repr(obj: Any) -> str:
     """
     Get a useful dbg representation of an object.
 
@@ -84,69 +84,101 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
         }
     }
     """
+
     INDENT_INCREMENT = 4
-    fields_dbg_repr = []
 
-    # Handle data containers.
-    if isinstance(object_, (list, set, tuple)):
-        for item in object_:
-            # <num_of_ident><val>
-            fields_dbg_repr.append(
-                "%s%s"
-                % (
-                    " " * (indent + INDENT_INCREMENT),
-                    _get_human_readable_repr(item, indent + INDENT_INCREMENT),
-                )
-            )
+    def _get_human_readable_repr_recursion(
+        obj: Any, indent: int, recursion_path: set
+    ) -> str:
+        """recursion_path: Backtracking algorithm to detect cyclic reference"""
+        if id(obj) in recursion_path:
+            if isinstance(obj, list):
+                return "[...]"
+            elif isinstance(obj, dict):
+                return "{...}"
+            return "CYCLIC REFERENCE"
+        recursion_path.add(id(obj))
 
-        if isinstance(object_, list):
-            return "[\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "]"
-        elif isinstance(object_, tuple):
-            return "(\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + ")"
-        else:
-            return "{\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
-    elif isinstance(object_, dict):
-        for key, value in object_.items():
-            if _is_built_in_types(value):
-                # <num_of_ident><key>: <val>
-                fields_dbg_repr.append(
-                    "%s%s: %s" % (" " * (indent + INDENT_INCREMENT), key, value)
-                )
-            else:
-                fields_dbg_repr.append(
-                    "%s%s: %s"
-                    % (
-                        " " * (indent + INDENT_INCREMENT),
-                        key,
-                        _get_human_readable_repr(value, indent + INDENT_INCREMENT),
+        try:
+            fields_dbg_repr = []
+
+            # Handle data containers.
+            if isinstance(obj, (list, set, tuple)):
+                for item in obj:
+                    # <num_of_ident><val>
+                    fields_dbg_repr.append(
+                        "%s%s"
+                        % (
+                            " " * (indent + INDENT_INCREMENT),
+                            _get_human_readable_repr_recursion(
+                                item, indent + INDENT_INCREMENT, recursion_path
+                            ),
+                        )
                     )
-                )
-        return "{\n" + "\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
-    elif _is_numpy_tensor_pandas_data(object_):
-        return "\n" + repr(object_)
-    elif _has_custom_repr(object_):
-        return repr(object_)
-    elif _has_custom_str(object_) or _is_built_in_types(object_):
-        return str(object_)
 
-    # Just an object without __repr__ or __str__ provided.
-    for key, value in object_.__dict__.items():
-        fields_dbg_repr.append(
-            "%s%s: %s"
-            % (
-                " " * (indent + INDENT_INCREMENT),
-                key,
-                _get_human_readable_repr(value, indent + INDENT_INCREMENT),
-            )
-        )
-    return (
-        object_.__class__.__name__
-        + " {\n"
-        + "\n".join(fields_dbg_repr)
-        + "\n"
-        + " " * indent
-        + "}"
-    )
+                if isinstance(obj, list):
+                    return (
+                        "[\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "]"
+                    )
+                elif isinstance(obj, tuple):
+                    return (
+                        "(\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + ")"
+                    )
+                else:
+                    return (
+                        "{\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
+                    )
+            elif isinstance(obj, dict):
+                for key, value in obj.items():
+                    if _is_built_in_types(value):
+                        # <num_of_ident><key>: <val>
+                        fields_dbg_repr.append(
+                            "%s%s: %s" % (" " * (indent + INDENT_INCREMENT), key, value)
+                        )
+                    else:
+                        fields_dbg_repr.append(
+                            "%s%s: %s"
+                            % (
+                                " " * (indent + INDENT_INCREMENT),
+                                key,
+                                _get_human_readable_repr_recursion(
+                                    value, indent + INDENT_INCREMENT, recursion_path
+                                ),
+                            )
+                        )
+                return "{\n" + "\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
+            elif _is_numpy_tensor_pandas_data(obj):
+                return "\n" + repr(obj)
+            elif _has_custom_repr(obj):
+                return repr(obj)
+            elif _has_custom_str(obj) or _is_built_in_types(obj):
+                return str(obj)
+            else:
+                # Just an object without __repr__ or __str__ provided.
+                for key, value in obj.__dict__.items():
+                    fields_dbg_repr.append(
+                        "%s%s: %s"
+                        % (
+                            " " * (indent + INDENT_INCREMENT),
+                            key,
+                            _get_human_readable_repr_recursion(
+                                value, indent + INDENT_INCREMENT, recursion_path
+                            ),
+                        )
+                    )
+                return (
+                    obj.__class__.__name__
+                    + " {\n"
+                    + "\n".join(fields_dbg_repr)
+                    + "\n"
+                    + " " * indent
+                    + "}"
+                )
+        finally:
+            # This will execute BEFORE any return statement in try block.
+            recursion_path.remove(id(obj))
+
+    return _get_human_readable_repr_recursion(obj, 0, set())
 
 
 # TODO: How to add typehint for frame argument?
@@ -214,7 +246,7 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     for raw_arg, evaluated_arg in zip(raw_args, evaluated_args):
         human_readable_repr = _get_human_readable_repr(evaluated_arg)
         print(
-            # [<file_rel_path>:<line_no>:<col_no>] <raw_args> = <dbg_repr>
+            # [<file_rel_path>:<line_no>:<col_no>] <raw_arg> = <dbg_repr>
             "[%s:%s:%s] %s = %s"
             % (
                 path.relpath(info.filename),

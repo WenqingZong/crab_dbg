@@ -4,33 +4,35 @@ from crab_dbg import dbg
 
 
 class Node:
-    def __init__(self, val=0, next_=None):
+    def __init__(self, val=0, next_=None, prev=None):
         self.val = val
         self.next = next_
+        self.prev = prev
 
 
-class LinkedList:
-    def __init__(self, start=None):
-        self.start = start
+class DoubleLinkedList:
+    def __init__(self, head=None, tail=None):
+        self.head = head
+        self.tail = tail
 
     @staticmethod
-    def create(n: int) -> "LinkedList":
+    def create(n: int) -> "DoubleLinkedList":
         """
         Create a LinkedList of n elements, value ranges from 0 to n - 1.
         """
         if n <= 0:
-            raise ValueError("A linked list with %d element is meaningless", n)
+            raise ValueError("A double linked list with %d element is meaningless", n)
 
-        start = Node(0)
-        linked_list = LinkedList(start)
+        head = Node(0)
 
-        cur = start
+        cur = head
         for i in range(1, n):
             new_node = Node(i)
             cur.next = new_node
+            new_node.prev = cur
             cur = cur.next
 
-        return linked_list
+        return DoubleLinkedList(head=head, tail=cur)
 
 
 class Phone:
@@ -90,14 +92,14 @@ if __name__ == "__main__":
     dbg(1 + 1)
 
     # When used with objects, it will show all fields contained by that object.
-    linked_list = LinkedList.create(2)
-    dbg(linked_list)
+    double_linked_list = DoubleLinkedList.create(2)
+    dbg(double_linked_list)
 
     # dbg() works with lists, tuples, and dictionaries.
     dbg(
-        [linked_list, linked_list],
-        (linked_list, linked_list),
-        {"a": 1, "b": linked_list},
+        [double_linked_list, double_linked_list],
+        (double_linked_list, double_linked_list),
+        {"a": 1, "b": double_linked_list},
         [
             1,
             2,
@@ -108,8 +110,8 @@ if __name__ == "__main__":
 
     # For even more complex structures, it works as well.
     stack = Stack()
-    stack.push(linked_list)
-    stack.push(linked_list)
+    stack.push(double_linked_list)
+    stack.push(double_linked_list)
     dbg(stack)
 
     dbg("What if my input is a string?")
@@ -117,6 +119,11 @@ if __name__ == "__main__":
     # If your type has its own __repr__ or __str__ implementation, no worries, crab_dbg will jut use it.
     phone = Phone("Apple", "white", 1099)
     dbg(phone)
+
+    # If you are extremely bored.
+    infinite_list = []
+    infinite_list.append(infinite_list)
+    dbg(infinite_list)
 
     # If invoked without arguments, then it will just print the filename and line number.
     dbg()
