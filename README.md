@@ -15,7 +15,7 @@ Currently (version `0.1.1`), this library have three optional features: `numpy`,
 from sys import stderr
 from crab_dbg import dbg
 
-pai = 3.14
+pi = 3.14
 ultimate_answer = 42
 flag = True
 fruits = ["apple", "peach", "watermelon"]
@@ -27,7 +27,7 @@ country_to_capital_cities = {
 
 # You can use dbg to inspect a lot of variables.
 dbg(
-    pai,
+    pi,
     ultimate_answer,
     flag,  # You can leave a comment here as well, dbg() won't show this comment.
     fruits,

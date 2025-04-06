@@ -1,37 +1,27 @@
 import dis
 import inspect
 from io import StringIO
+import sys
 import tokenize
 from typing import Any
-
-NUMPY_ENABLED = True
-try:
-    import numpy as np
-except (ModuleNotFoundError, ImportError):
-    NUMPY_ENABLED = False
-
-PANDAS_ENABLED = True
-try:
-    import pandas
-except (ModuleNotFoundError, ImportError):
-    PANDAS_ENABLED = False
-
-TORCH_ENABLED = True
-try:
-    import torch
-except (ModuleNotFoundError, ImportError):
-    TORCH_ENABLED = False
 
 
 def _is_numpy_tensor_pandas_data(val: Any) -> bool:
     """Check if the value is numpy ndarray, pytorch tensor, or pandas data frame"""
-    if NUMPY_ENABLED and isinstance(val, np.ndarray):
+    cls = val.__class__
+    module = cls.__module__
+    name = cls.__name__
+
+    # Check for numpy.ndarray
+    if module == "numpy" and name == "ndarray":
         return True
 
-    if PANDAS_ENABLED and isinstance(val, pandas.DataFrame):
+    # Check for PyTorch Tensor
+    if module == "torch" and name == "Tensor":
         return True
 
-    if TORCH_ENABLED and isinstance(val, torch.Tensor):
+    # Check for pandas DataFrame (module starts with 'pandas' and class name is 'DataFrame')
+    if module.startswith("pandas.") and name == "DataFrame":
         return True
 
     return False
@@ -58,7 +48,12 @@ def _is_data_container(val: Any) -> bool:
     """
     Determine if a value's type if list, tuple, or dict.
     """
-    return isinstance(val, list) or isinstance(val, tuple) or isinstance(val, dict)
+    return (
+        isinstance(val, list)
+        or isinstance(val, tuple)
+        or isinstance(val, dict)
+        or isinstance(val, set)
+    )
 
 
 def _get_dbg_raw_args(source_code: str, positions: dis.Positions) -> list[str]:
@@ -222,7 +217,7 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
 
 def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     """
-    Python implementation of rust's dbg!() macro. All behaviour should be the same (or similar at least) as dbg!().
+    Python implementation of rust's dbg!() macro. All behaviors should be the same (or similar at least) as dbg!().
 
     This implementation is meant to be a perfect replacement to python's built-in function print(), so it supports all
     keyword raw_args accepted by print().
@@ -235,10 +230,12 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
 
-    # Read the source code file as a single string.
-    source_code = ""
-    with open(info.filename, "r") as f:
-        source_code = f.read()
+    try:
+        # Read the source code file as a single string.
+        source_code = inspect.getsource(frame)
+    except OSError as e:
+        print("crab_dbg:", e, file=sys.stderr)
+        return
 
     raw_args = _get_dbg_raw_args(source_code, info.positions)
 
