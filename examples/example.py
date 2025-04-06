@@ -65,7 +65,8 @@ if __name__ == "__main__":
     pi = 3.14
     ultimate_answer = 42
     flag = True
-    fruits = ["apple", "peach", "watermelon"]
+    stock_price = [100, 99, 101, 1]
+    fruits = {"apple", "peach", "watermelon"}
     country_to_capital_cities = {
         "China": "Beijing",
         "United Kingdom": "London",
@@ -77,6 +78,7 @@ if __name__ == "__main__":
         pi,
         ultimate_answer,
         flag,  # You can leave a comment here as well, dbg() won't show this comment.
+        stock_price,
         fruits,
         country_to_capital_cities,
     )

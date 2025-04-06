@@ -1,7 +1,7 @@
 import dis
 import inspect
 from io import StringIO
-import sys
+from sys import modules, stderr
 import tokenize
 from typing import Any
 
@@ -156,7 +156,7 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     fields_dbg_repr = []
 
     # Handle data containers.
-    if isinstance(object_, list) or isinstance(object_, tuple):
+    if isinstance(object_, (list, set, tuple)):
         for item in object_:
             # <num_of_ident><val>
             fields_dbg_repr.append(
@@ -169,8 +169,10 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
 
         if isinstance(object_, list):
             return "[\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "]"
-        else:
+        elif isinstance(object_, tuple):
             return "(\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + ")"
+        else:
+            return "{\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
     elif isinstance(object_, dict):
         for key, value in object_.items():
             if _is_built_in_types(value):
@@ -215,6 +217,24 @@ def _get_human_readable_repr(object_: Any, indent: int = 0) -> str:
     )
 
 
+def _get_source_code(frame: "inspect.FrameType", filename: str) -> str | None:
+    """
+    Get the source code of this frame as a single string.
+    We try to read the named file first, if failed, then try inspect.getsource to handle the cases where source code
+    file is not available.
+    """
+    try:
+        with open(filename, "r") as f:
+            return f.read()
+    except OSError:
+        pass
+
+    try:
+        return inspect.getsource()
+    except OSError:
+        return None
+
+
 def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     """
     Python implementation of rust's dbg!() macro. All behaviors should be the same (or similar at least) as dbg!().
@@ -230,11 +250,10 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
 
-    try:
-        # Read the source code file as a single string.
-        source_code = inspect.getsource(frame)
-    except OSError as e:
-        print("crab_dbg:", e, file=sys.stderr)
+    # Cannot use inspect.getsource, limited by dynamic environment, such like pytest.
+    source_code = _get_source_code(frame, info.filename)
+    if source_code is None:
+        print("crab_dbg: Sorry, cannot get original code", file=stderr)
         return
 
     raw_args = _get_dbg_raw_args(source_code, info.positions)
