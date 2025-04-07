@@ -3,6 +3,7 @@ import dis
 import inspect
 from os import path
 from sys import stderr
+from types import FrameType
 from typing import Any
 
 
@@ -198,8 +199,7 @@ def _get_human_readable_repr(obj: Any) -> str:
     return _get_human_readable_repr_recursion(obj, 0, set())
 
 
-# TODO: How to add typehint for frame argument?
-def _get_source_code(frame, filename: str) -> str | None:
+def _get_source_code(frame: FrameType, filename: str) -> str | None:
     """
     Get the source code of this frame as a single string.
     We try to read the named file first, if failed, then try inspect.getsource() to handle the cases where source code
