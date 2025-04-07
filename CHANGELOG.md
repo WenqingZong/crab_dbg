@@ -1,6 +1,17 @@
+## Version `0.1.3` 2025-04-07
+### Added
+- More unit tests.
+### Changed
+- Print relative path, not absolute path.
+- Deleted `numpy`, `torch` and `pandas` dependencies. Faster import now.
+- Now we use `ast` to parse and unparse source code.
+### Fixed
+- Infinite recursion bug of customised class object.
+- Ident error if the class's customised `__repr__` or `__str__` is formated to multiline string.
+
 ## Version `0.1.2` 2025-03-28
 ### Changed
-- Fixed import error introduced in `0.1.2`.
+- Fixed import error introduced in `0.1.1`.
 
 ## Version `0.1.1` 2025-03-28
 ### Changed

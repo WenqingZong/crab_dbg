@@ -80,128 +80,254 @@ dbg(torch_tensor)
 
 # If invoked without arguments, then it will just print the filename and line number.
 dbg()
+
+import numpy as np
+import torch
+# This library can also be used with your favorite data science libraries if you enabled our optional features.
+numpy_array = np.zeros(shape=(2, 3))
+dbg(numpy_array)
+
+torch_tensor = torch.from_numpy(numpy_array)
+dbg(torch_tensor)
 ```
 
 The above example will generate the following output in your terminal:
 ```text
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:76:5] pai = 3.14
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:76:5] ultimate_answer = 42
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:76:5] flag = True
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:76:5] fruits = [
-    'apple',
-    'peach',
-    'watermelon'
+[examples/example.py:76:5] pi = 3.14
+[examples/example.py:76:5] 1 + 1 = 2
+[examples/example.py:76:5] sorted(stock_price) = [
+    1,
+    99,
+    100,
+    101
 ]
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:76:5] country_to_capital_cities = {
-    China: Beijing
-    United Kingdom: London
-    Liyue: Liyue Harbor
+[examples/example.py:76:5] "This string contains (, ' and ," = "This string contains (, ' and ,"
+[examples/example.py:76:5] ultimate_answer = 42
+[examples/example.py:76:5] flag = True
+[examples/example.py:76:5] stock_price = [
+    100,
+    99,
+    101,
+    1
+]
+[examples/example.py:76:5] fruits = {
+    'peach',
+    'apple',
+    'watermelon'
 }
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:85:5] country_to_capital_cities = {
-    China: Beijing
-    United Kingdom: London
-    Liyue: Liyue Harbor
+[examples/example.py:76:5] country_to_capital_cities = {
+    China: 'Beijing'
+    United Kingdom: 'London'
+    Liyue: 'Liyue Harbor'
 }
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:88:5] 1 + 1 = 2
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:92:5] linked_list = LinkedList {
-    start: Node {
+[examples/example.py:89:5] country_to_capital_cities = {
+    China: 'Beijing'
+    United Kingdom: 'London'
+    Liyue: 'Liyue Harbor'
+}
+[examples/example.py:92:5] 1 + 1 = 2
+[examples/example.py:96:5] double_linked_list = DoubleLinkedList {
+    head: Node {
         val: 0
         next: Node {
             val: 1
             next: None
+            prev: CYCLIC REFERENCE
+        }
+        prev: None
+    }
+    tail: Node {
+        val: 1
+        next: None
+        prev: Node {
+            val: 0
+            next: CYCLIC REFERENCE
+            prev: None
         }
     }
 }
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:95:5] [linked_list, linked_list] = [
-    LinkedList {
-        start: Node {
+[examples/example.py:99:5] [double_linked_list, double_linked_list] = [
+    DoubleLinkedList {
+        head: Node {
             val: 0
             next: Node {
                 val: 1
                 next: None
+                prev: CYCLIC REFERENCE
+            }
+            prev: None
+        }
+        tail: Node {
+            val: 1
+            next: None
+            prev: Node {
+                val: 0
+                next: CYCLIC REFERENCE
+                prev: None
             }
         }
     },
-    LinkedList {
-        start: Node {
+    DoubleLinkedList {
+        head: Node {
             val: 0
             next: Node {
                 val: 1
                 next: None
+                prev: CYCLIC REFERENCE
+            }
+            prev: None
+        }
+        tail: Node {
+            val: 1
+            next: None
+            prev: Node {
+                val: 0
+                next: CYCLIC REFERENCE
+                prev: None
             }
         }
     }
 ]
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:95:5] (linked_list, linked_list) = (
-    LinkedList {
-        start: Node {
+[examples/example.py:99:5] (double_linked_list, double_linked_list) = (
+    DoubleLinkedList {
+        head: Node {
             val: 0
             next: Node {
                 val: 1
                 next: None
+                prev: CYCLIC REFERENCE
+            }
+            prev: None
+        }
+        tail: Node {
+            val: 1
+            next: None
+            prev: Node {
+                val: 0
+                next: CYCLIC REFERENCE
+                prev: None
             }
         }
     },
-    LinkedList {
-        start: Node {
+    DoubleLinkedList {
+        head: Node {
             val: 0
             next: Node {
                 val: 1
                 next: None
+                prev: CYCLIC REFERENCE
+            }
+            prev: None
+        }
+        tail: Node {
+            val: 1
+            next: None
+            prev: Node {
+                val: 0
+                next: CYCLIC REFERENCE
+                prev: None
             }
         }
     }
 )
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:95:5] {"a": 1, "b": linked_list} = {
+[examples/example.py:99:5] {'a': 1, 'b': [double_linked_list]} = {
     a: 1
-    b: LinkedList {
-        start: Node {
-            val: 0
-            next: Node {
+    b: [
+        DoubleLinkedList {
+            head: Node {
+                val: 0
+                next: Node {
+                    val: 1
+                    next: None
+                    prev: CYCLIC REFERENCE
+                }
+                prev: None
+            }
+            tail: Node {
                 val: 1
                 next: None
-            }
-        }
-    }
-}
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:95:5] [1,2,3,4,] = [
-    1,
-    2,
-    3,
-    4
-]
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:111:5] stack = Stack {
-    data: [
-        LinkedList {
-            start: Node {
-                val: 0
-                next: Node {
-                    val: 1
-                    next: None
-                }
-            }
-        },
-        LinkedList {
-            start: Node {
-                val: 0
-                next: Node {
-                    val: 1
-                    next: None
+                prev: Node {
+                    val: 0
+                    next: CYCLIC REFERENCE
+                    prev: None
                 }
             }
         }
     ]
 }
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:113:5] "What if my input is a string?" = 'What if my input is a string?'
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:117:5] phone = A white phone made by Apple, official price: 1099.
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:120:5] numpy_array = 
+[examples/example.py:99:5] [1, 2, 3, 4] = [
+    1,
+    2,
+    3,
+    4
+]
+[examples/example.py:115:5] stack = Stack {
+    data: [
+        DoubleLinkedList {
+            head: Node {
+                val: 0
+                next: Node {
+                    val: 1
+                    next: None
+                    prev: CYCLIC REFERENCE
+                }
+                prev: None
+            }
+            tail: Node {
+                val: 1
+                next: None
+                prev: Node {
+                    val: 0
+                    next: CYCLIC REFERENCE
+                    prev: None
+                }
+            }
+        },
+        DoubleLinkedList {
+            head: Node {
+                val: 0
+                next: Node {
+                    val: 1
+                    next: None
+                    prev: CYCLIC REFERENCE
+                }
+                prev: None
+            }
+            tail: Node {
+                val: 1
+                next: None
+                prev: Node {
+                    val: 0
+                    next: CYCLIC REFERENCE
+                    prev: None
+                }
+            }
+        }
+    ]
+}
+[examples/example.py:117:5] 'What if my input is a string?' = 'What if my input is a string?'
+[examples/example.py:121:5] phone = Phone:
+    Color: white
+    Brand: Apple
+    Price: 1099
+[examples/example.py:122:5] {'my_phones': [phone]} = {
+    my_phones: [
+        Phone:
+            Color: white
+            Brand: Apple
+            Price: 1099
+    ]
+}
+[examples/example.py:127:5] infinite_list = [
+    [...]
+]
+[examples/example.py:130:5]
+[examples/example.py:136:5] numpy_array = 
 array([[0., 0., 0.],
        [0., 0., 0.]])
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:123:5] torch_tensor = 
+[examples/example.py:139:5] torch_tensor = 
 tensor([[0., 0., 0.],
         [0., 0., 0.]], dtype=torch.float64)
-[/Users/wenqingzong/Projects/crab_dbg/examples/example.py:126:5]
-
 ```
 
 For full executable code please refer to [./examples/example.py](./examples/example.py).
