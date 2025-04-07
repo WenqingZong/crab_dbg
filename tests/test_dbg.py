@@ -21,26 +21,23 @@ def _redirect_stdout_stderr_to_buffer() -> tuple[io.StringIO, io.StringIO]:
     return stdout_buffer, stderr_buffer
 
 
-def _revert_stdout_stderr_change():
+def _reset_stdout_stderr():
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
 
 
-def _assert_correct(
-    dbg_outputs: str, var_names: list[str], var_values: list[Any]
-) -> None:
+def _assert_correct(dbg_outputs: str, expected_outputs: str) -> None:
     """
     This function checks if dbg() outputs desired variable name and their desired value.
-    dbg() output contains line number, and absolute file path, so we cannot exam them.
+    Note that we do not check line no and col no in the output, as they change for almost every modification of this
+    file.
     """
-    dbg_outputs = dbg_outputs.split("\n")
-    assert len(dbg_outputs) - 1 == len(var_names) == len(var_values)
+    dbg_outputs: list[str] = dbg_outputs.split("\n")
+    expected_outputs: list[str] = expected_outputs.split("\n")
 
-    for dbg_output, var_name, var_value in zip(dbg_outputs[:-1], var_names, var_values):
-        dbg_output = re.sub(r"\[.*?\]", "", dbg_output)
-        splits = dbg_output.split("=")
-        assert splits[0].strip() == var_name
-        assert splits[1].strip() == repr(var_value)
+    assert dbg_outputs[0].startswith("[tests/test_dbg.py:")
+    for dbg_output, expected_output in zip(dbg_outputs[1:], expected_outputs[1:]):
+        assert dbg_output == expected_output
 
 
 def test_single_argument():
@@ -48,10 +45,10 @@ def test_single_argument():
 
     pi = 3.14
     dbg(pi)
-    _revert_stdout_stderr_change()
+    _reset_stdout_stderr()
 
     # Only one of stdout and stderr will contain the actual output, the other would be empty.
-    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pi"], [pi])
+    _assert_correct(stdout.getvalue() + stderr.getvalue(), "pi = 3.14\n")
 
 
 def test_single_argument_with_comment():
@@ -61,7 +58,7 @@ def test_single_argument_with_comment():
     dbg(
         pi,  # This comment should not show in dbg output
     )
-    _revert_stdout_stderr_change()
+    _reset_stdout_stderr()
 
     # Only one of stdout and stderr will contain the actual output, the other would be empty.
-    _assert_correct(stdout.getvalue() + stderr.getvalue(), ["pi"], [pi])
+    _assert_correct(stdout.getvalue() + stderr.getvalue(), "pi = 3.14\n")
