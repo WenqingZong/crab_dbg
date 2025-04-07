@@ -42,6 +42,18 @@ def _assert_correct(dbg_outputs: str, expected_outputs: str) -> None:
         assert dbg_output.endswith(expected_output)
 
 
+def test_no_argument():
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    dbg()
+    _reset_stdout_stderr()
+
+    actual_output = stdout.getvalue().strip()
+    assert actual_output.startswith("[tests/test_dbg.py") and actual_output.endswith(
+        "]"
+    )
+
+
 def test_single_argument():
     stdout, _ = _redirect_stdout_stderr_to_buffer()
 
@@ -96,6 +108,7 @@ def test_multiple_arguments():
         stock_price,
         country_to_capital_cities,
     )
+    _reset_stdout_stderr()
 
     expected_outputs = """
 pi = 3.14
@@ -134,6 +147,7 @@ def test_cyclic_reference():
     infinite_dict = {}
     infinite_dict["self"] = infinite_dict
     dbg(infinite_list, infinite_dict)
+    _reset_stdout_stderr()
 
     expected_outputs = """
 infinite_list = [
@@ -259,6 +273,7 @@ def test_nested_data_container():
             4,
         ],
     )
+    _reset_stdout_stderr()
 
     expected_outputs = """
 [double_linked_list, double_linked_list] = [
@@ -400,6 +415,7 @@ def test_complex_object():
     stack.push(double_linked_list)
     stack.push(double_linked_list)
     dbg(stack)
+    _reset_stdout_stderr()
 
     expected_outputs = """
 Stack {
@@ -456,6 +472,7 @@ def test_indent_with_multi_line_repr():
 
     phone = Phone("Apple", "White", 1099)
     dbg({"my_phones": [phone]})
+    _reset_stdout_stderr()
 
     expected_outputs = """
 {'my_phones': [phone]} = {
