@@ -111,7 +111,7 @@ def _get_human_readable_repr(obj: Any) -> str:
     INDENT_INCREMENT = 4
 
     def _get_human_readable_repr_recursion(
-        obj: Any, indent: int, recursion_path: set
+        obj: Any, indent: int, recursion_path: set, ml_container_new_line: bool
     ) -> str:
         """recursion_path: Backtracking algorithm to detect cyclic reference"""
         if id(obj) in recursion_path:
@@ -134,7 +134,10 @@ def _get_human_readable_repr(obj: Any) -> str:
                         % (
                             " " * (indent + INDENT_INCREMENT),
                             _get_human_readable_repr_recursion(
-                                item, indent + INDENT_INCREMENT, recursion_path
+                                item,
+                                indent + INDENT_INCREMENT,
+                                recursion_path,
+                                ml_container_new_line=False,
                             ),
                         )
                     )
@@ -160,13 +163,25 @@ def _get_human_readable_repr(obj: Any) -> str:
                             " " * (indent + INDENT_INCREMENT),
                             key,
                             _get_human_readable_repr_recursion(
-                                value, indent + INDENT_INCREMENT, recursion_path
+                                value,
+                                indent + INDENT_INCREMENT,
+                                recursion_path,
+                                ml_container_new_line=True,
                             ),
                         )
                     )
-                return "{\n" + "\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
+                return "{\n" + ",\n".join(fields_dbg_repr) + "\n" + " " * indent + "}"
             elif _is_numpy_tensor_pandas_data(obj):
-                return "\n" + repr(obj)
+                if indent == 0:
+                    return "\n" + _indent_multiline_str(repr(obj), indent)
+                elif ml_container_new_line:
+                    return (
+                        "\n"
+                        + " " * (indent + INDENT_INCREMENT)
+                        + _indent_multiline_str(repr(obj), indent + INDENT_INCREMENT)
+                    )
+                else:
+                    return _indent_multiline_str(repr(obj), indent)
             elif _has_custom_repr(obj):
                 return _indent_multiline_str(repr(obj), indent)
             elif _has_custom_str(obj) or _is_built_in_types(obj):
@@ -180,7 +195,10 @@ def _get_human_readable_repr(obj: Any) -> str:
                             " " * (indent + INDENT_INCREMENT),
                             key,
                             _get_human_readable_repr_recursion(
-                                value, indent + INDENT_INCREMENT, recursion_path
+                                value,
+                                indent + INDENT_INCREMENT,
+                                recursion_path,
+                                ml_container_new_line=True,
                             ),
                         )
                     )
@@ -196,7 +214,7 @@ def _get_human_readable_repr(obj: Any) -> str:
             # This will execute BEFORE any return statement in try block.
             recursion_path.remove(id(obj))
 
-    return _get_human_readable_repr_recursion(obj, 0, set())
+    return _get_human_readable_repr_recursion(obj, 0, set(), ml_container_new_line=True)
 
 
 def _get_source_code(frame: FrameType, filename: str) -> str | None:
@@ -240,9 +258,9 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
 
     raw_args = _get_dbg_raw_args(source_code, info.positions)
 
-    assert len(raw_args) == len(
-        evaluated_args
-    ), "Number of raw_args does not equal to number of received args"
+    assert len(raw_args) == len(evaluated_args), (
+        "Number of raw_args does not equal to number of received args"
+    )
 
     # If no arguments at all.
     if len(raw_args) == 0:
