@@ -129,8 +129,8 @@ stock_price = [
     1
 ]
 country_to_capital_cities = {
-    China: 'Beijing'
-    United Kingdom: 'London'
+    China: 'Beijing',
+    United Kingdom: 'London',
     Liyue: 'Liyue Harbor'
 }
 """
@@ -361,7 +361,7 @@ def test_nested_data_container():
     }
 )
 {'a': 1, 'b': [double_linked_list]} = {
-    a: 1
+    a: 1,
     b: [
         DoubleLinkedList {
             head: Node {
