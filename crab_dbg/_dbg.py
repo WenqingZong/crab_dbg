@@ -240,9 +240,9 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
 
     raw_args = _get_dbg_raw_args(source_code, info.positions)
 
-    assert len(raw_args) == len(evaluated_args), (
-        "Number of raw_args does not equal to number of received args"
-    )
+    assert len(raw_args) == len(
+        evaluated_args
+    ), "Number of raw_args does not equal to number of received args"
 
     # If no arguments at all.
     if len(raw_args) == 0:
