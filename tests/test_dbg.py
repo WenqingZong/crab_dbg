@@ -1,6 +1,8 @@
 import io
 import sys
 
+import numpy as np
+
 from crab_dbg import dbg
 
 
@@ -482,6 +484,69 @@ def test_indent_with_multi_line_repr():
             Brand: Apple
             Price: 1099
     ]
+}
+"""
+
+    _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_numpy_simple():
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    ndarray = np.array([[1, 2, 3], [4, 5, 6]])
+    dbg(ndarray)
+    _reset_stdout_stderr()
+
+    expected_outputs = """
+ndarray = 
+array([[1, 2, 3],
+       [4, 5, 6]])
+"""
+
+    _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_numpy_nested():
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    ndarray = np.array([[1, 2, 3], [4, 5, 6]])
+    stack = Stack()
+    stack.push({"dict_key": ndarray})
+    dbg(stack)
+    _reset_stdout_stderr()
+
+    expected_outputs = """
+stack = Stack {
+    data: [
+        {
+            dict_key: 
+                array([[1, 2, 3],
+                       [4, 5, 6]])
+        }
+    ]
+}
+"""
+
+    _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_numpy_as_top_level_associated_variable():
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    ndarray = np.array([[1, 2, 3], [4, 5, 6]])
+
+    class MyClass:
+        def __init__(self, np_array):
+            self.np_array = np_array
+
+    dbg(MyClass(ndarray))
+    _reset_stdout_stderr()
+
+    expected_outputs = """
+MyClass(ndarray) = MyClass {
+    np_array: 
+        array([[1, 2, 3],
+               [4, 5, 6]])
 }
 """
 

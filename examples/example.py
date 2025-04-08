@@ -129,11 +129,13 @@ if __name__ == "__main__":
     # If invoked without arguments, then it will just print the filename and line number.
     dbg()
 
-    # import numpy as np
-    # import torch
-    # # This library can also be used with your favorite data science libraries if you enabled our optional features.
-    # numpy_array = np.zeros(shape=(2, 3))
-    # dbg(numpy_array)
-    #
-    # torch_tensor = torch.from_numpy(numpy_array)
-    # dbg(torch_tensor)
+    import numpy as np
+
+    # This library can also be used with your favorite data science libraries if you enabled our optional features.
+    ndarray = np.array([[1, 2, 3], [4, 5, 6]])
+    dbg(ndarray)
+
+    # And yes, even deeply nested ndarray is possible.
+    stack = Stack()
+    stack.push({"dict_key": ndarray})
+    dbg(stack)
