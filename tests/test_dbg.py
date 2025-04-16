@@ -551,3 +551,18 @@ MyClass(ndarray) = MyClass {
 """
 
     _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_control_character():
+    # Thanks for bug report from codycjy, https://github.com/WenqingZong/crab_dbg/issues/17
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    class Hack:
+        def __repr__(self) -> str:
+            return "\b" * 5 + "x" + "\b" * 5
+
+    dbg(Hack())
+    _reset_stdout_stderr()
+
+    expected_outputs = "Hack() = x"
+    _assert_correct(stdout.getvalue(), expected_outputs)

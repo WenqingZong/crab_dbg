@@ -2,9 +2,13 @@ from ast import parse, unparse
 import dis
 import inspect
 from os import path
+import re
 from sys import stderr
 from types import FrameType
 from typing import Any
+
+
+_CONTROL_CHAR_RE = re.compile("[\x00-\x1f\x7f-\x9f]")
 
 
 def _is_numpy_tensor_pandas_data(val: Any) -> bool:
@@ -86,23 +90,29 @@ def _get_human_readable_repr(obj: Any) -> str:
     }
     """
 
+    def _delete_special_characters(string: str) -> str:
+        """
+        Delete control characters like '\b'
+        """
+        return _CONTROL_CHAR_RE.sub("", string)
+
     def _indent_multiline_str(string: str, indent: int) -> str:
         """
-        Apply additional indent to a possibly already formated, multiline representation.
+        Apply additional indent to a possibly already formatted, multiline representation.
         """
         lines = string.splitlines(keepends=True)
         if not lines:
             return ""
 
         # No need to indent the first line.
-        first_line = lines[0].rstrip("\n\r")
+        first_line = _delete_special_characters(lines[0].rstrip("\n\r"))
         if len(lines) == 1:
             return first_line
 
         # Add indent.
         indented_lines = [first_line]
         for line in lines[1:]:
-            stripped_line = line.rstrip("\n\r")
+            stripped_line = _delete_special_characters(line.rstrip("\n\r"))
             indented_line = " " * indent + stripped_line
             indented_lines.append(indented_line)
 

@@ -60,6 +60,11 @@ class Stack:
         return self.data.pop()
 
 
+class Hack:
+    def __repr__(self) -> str:
+        return "\b" * 5 + "x" + "\b" * 5
+
+
 if __name__ == "__main__":
     pi = 3.14
     ultimate_answer = 42
@@ -139,3 +144,5 @@ if __name__ == "__main__":
     stack = Stack()
     stack.push({"dict_key": ndarray})
     dbg(stack)
+
+    dbg(Hack())
