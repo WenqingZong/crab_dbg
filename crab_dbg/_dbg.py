@@ -198,6 +198,7 @@ def _get_human_readable_repr(obj: Any) -> str:
                 return _indent_multiline_str(str(obj), indent)
             else:
                 # Just an object without __repr__ or __str__ provided.
+                # Handle instance variables.
                 for key, value in obj.__dict__.items():
                     fields_dbg_repr.append(
                         "%s%s: %s"
@@ -212,14 +213,43 @@ def _get_human_readable_repr(obj: Any) -> str:
                             ),
                         )
                     )
-                return (
-                    obj.__class__.__name__
-                    + " {\n"
-                    + "\n".join(fields_dbg_repr)
-                    + "\n"
-                    + " " * indent
-                    + "}"
-                )
+
+                # Handle class variables.
+                for key, value in obj.__class__.__dict__.items():
+                    if key.startswith("__") and key.endswith("__"):
+                        # Magic method, ignore
+                        continue
+                    if callable(value):
+                        # Function, ignore
+                        continue
+                    if key in obj.__dict__:
+                        # A class variable has the same name as instance variable, ignore.
+                        continue
+                    fields_dbg_repr.append(
+                        "%s%s: %s"
+                        % (
+                            " " * (indent + INDENT_INCREMENT),
+                            obj.__class__.__name__ + "." + key,
+                            _get_human_readable_repr_recursion(
+                                value,
+                                indent + INDENT_INCREMENT,
+                                recursion_path,
+                                ml_container_new_line=True,
+                            ),
+                        )
+                    )
+
+                if len(fields_dbg_repr) == 0:
+                    return obj.__class__.__name__ + " {\n" + " " * indent + "}"
+                else:
+                    return (
+                        obj.__class__.__name__
+                        + " {\n"
+                        + "\n".join(fields_dbg_repr)
+                        + "\n"
+                        + " " * indent
+                        + "}"
+                    )
         finally:
             # This will execute BEFORE any return statement in try block.
             recursion_path.remove(id(obj))

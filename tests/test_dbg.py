@@ -566,3 +566,60 @@ def test_control_character():
 
     expected_outputs = "Hack() = x"
     _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_empty_class():
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    class Hack:
+        pass
+
+    dbg(Hack())
+    _reset_stdout_stderr()
+
+    expected_outputs = """
+Hack() = Hack {
+}
+"""
+
+    _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_class_variable():
+    # Thanks for bug report from codycjy, https://github.com/WenqingZong/crab_dbg/issues/18
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    class Hack:
+        a = 1
+
+    dbg(Hack())
+    _reset_stdout_stderr()
+
+    expected_outputs = """
+Hack() = Hack {
+    Hack.a: 1
+}
+"""
+
+    _assert_correct(stdout.getvalue(), expected_outputs)
+
+
+def test_instance_variable_overloads_class_variable():
+    stdout, _ = _redirect_stdout_stderr_to_buffer()
+
+    class Hack:
+        a = 1
+
+        def __init__(self):
+            self.a = 2
+
+    dbg(Hack())
+    _reset_stdout_stderr()
+
+    expected_outputs = """
+Hack() = Hack {
+    a: 2
+}
+"""
+
+    _assert_correct(stdout.getvalue(), expected_outputs)
