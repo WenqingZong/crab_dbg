@@ -1,3 +1,8 @@
+## Version `0.1.4` 2025-04-17
+### Fixed
+- Add support for class variables. [issue](https://github.com/WenqingZong/crab_dbg/issues/18)
+- Add support for special character. [issue](https://github.com/WenqingZong/crab_dbg/issues/17)
+
 ## Version `0.1.3` 2025-04-07
 ### Added
 - More unit tests.
