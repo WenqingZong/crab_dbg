@@ -1,3 +1,7 @@
+## Version `0.1.5` 2025-12-14
+### Fixed
+- `dbg` should return given arguments, as to how rust's `dbg!()` macro does.
+
 ## Version `0.1.4` 2025-04-17
 ### Fixed
 - Add support for class variables. [issue](https://github.com/WenqingZong/crab_dbg/issues/18)
