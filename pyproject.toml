@@ -19,7 +19,7 @@ packages = ["crab_dbg"]
 
 [tool.uv]
 dev-dependencies = [
-    "numpy>=2.2.4",
+    "numpy>=2.2.4", # for testing code only
     "pytest",
     "ruff",
 ]
