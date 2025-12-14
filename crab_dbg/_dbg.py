@@ -349,6 +349,6 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
             file=file,
             flush=flush,
         )
-    
+
     # Return the first argument to enable chaining like Rust's dbg!
     return evaluated_args[0] if len(evaluated_args) == 1 else evaluated_args

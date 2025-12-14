@@ -63,7 +63,7 @@ def test_return_value():
     ret = dbg(1 + 1)
     assert ret == 2
 
-    ret = dbg(1 + 1, 2 ** 10, "Hello World")
+    ret = dbg(1 + 1, 2**10, "Hello World")
     assert ret == (2, 1024, "Hello World")
 
 
