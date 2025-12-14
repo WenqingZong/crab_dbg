@@ -4,7 +4,6 @@ import inspect
 from os import path
 import re
 from sys import stderr
-import sys
 from types import FrameType
 from typing import Any
 
