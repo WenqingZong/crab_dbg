@@ -4,6 +4,7 @@ import inspect
 from os import path
 import re
 from sys import stderr
+import sys
 from types import FrameType
 from typing import Any
 
@@ -277,16 +278,28 @@ def _get_source_code(frame: FrameType, filename: str) -> str | None:
 
 def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     """
-    Python implementation of rust's dbg!() macro. All behaviors should be the same (or similar at least) as dbg!().
+    Print the value of the argument and return it, similar to Rust's dbg! macro.
 
-    This implementation is meant to be a perfect replacement to python's built-in function print(), so it supports all
-    keyword raw_args accepted by print().
+    This function prints the value of the argument to stderr and returns the argument itself.
+    This allows for chaining operations after the dbg! call, just like in Rust.
 
-    @param sep: Same as print().
-    @param end: Same as print().
-    @param file: Same as print().
-    @param flush: Same as print().
+    Example:
+        let a = 2;
+        let b = dbg!(a * 2) + 1;
+        //      ^-- prints: [src/main.rs:2:9] a * 2 = 4
+        assert_eq!(b, 5);
+
+    Args:
+        *evaluated_args: The arguments to be printed and returned.
+        sep: Separator string for multiple arguments.
+        end: End string for the output.
+        file: File to write to (default is sys.stderr).
+        flush: Whether to flush the output.
+
+    Returns:
+        The first argument passed to the function, or None if no arguments.
     """
+
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
 
@@ -294,7 +307,7 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
     source_code = _get_source_code(frame, info.filename)
     if source_code is None:
         print("crab_dbg: Sorry, cannot get original code", file=stderr)
-        return
+        return evaluated_args[0] if len(evaluated_args) == 1 else evaluated_args
 
     raw_args = _get_dbg_raw_args(source_code, info.positions)
 
@@ -317,6 +330,7 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
             file=file,
             flush=flush,
         )
+        return None
 
     for raw_arg, evaluated_arg in zip(raw_args, evaluated_args):
         human_readable_repr = _get_human_readable_repr(evaluated_arg)
@@ -335,3 +349,6 @@ def dbg(*evaluated_args, sep=" ", end="\n", file=None, flush=False):
             file=file,
             flush=flush,
         )
+    
+    # Return the first argument to enable chaining like Rust's dbg!
+    return evaluated_args[0] if len(evaluated_args) == 1 else evaluated_args

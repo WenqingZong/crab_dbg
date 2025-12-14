@@ -56,6 +56,17 @@ def test_no_argument():
     )
 
 
+def test_return_value():
+    ret = dbg()
+    assert ret is None
+
+    ret = dbg(1 + 1)
+    assert ret == 2
+
+    ret = dbg(1 + 1, 2 ** 10, "Hello World")
+    assert ret == (2, 1024, "Hello World")
+
+
 def test_single_argument():
     stdout, _ = _redirect_stdout_stderr_to_buffer()
 

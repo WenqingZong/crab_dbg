@@ -11,3 +11,6 @@
 .ruff_cache/
 crab_dbg.egg-info/
 dist/
+
+# Aider
+.aider*
